@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { parseString } from 'xml2js'
-import { getCurrencies } from '../api'
+
+import Select from '../component/UI/Select/Select'
 
 import './App.css'
-
 
 class App extends Component {
 
@@ -18,14 +18,22 @@ class App extends Component {
     var innerCubes = outterCubes.Cube;
     var innerCubesArray = innerCubes[0];
     var Cubes = innerCubesArray.Cube;
-    Cubes.map(cube => console.log(cube.$.currency));
+    // Cubes.map(cube => console.log(cube.$.currency));
+    return Cubes;
   }
 
 
   toJSON (data) {
     parseString(data, (err, result) => {
-      this.loopNestedObj(result); 
-    });
+      try {
+        const currencies = this.loopNestedObj(result);
+        this.setState({ currencies: currencies });
+      }
+      catch (error) {
+        console.log(error);
+      }
+       
+    });  
   }
 
   componentDidMount() {
@@ -39,7 +47,7 @@ class App extends Component {
       })
       .catch((error) => console.log(error) );
   }
-  
+
   render() {
     return (
 
@@ -48,12 +56,7 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-            <select>
-              <option value="euro">United States Dollar</option>
-              <option value="USDollars">USD</option>
-              <option value="Jenes">JPY</option>
-              <option value="Niidea">BGN</option>
-            </select>
+            <Select numberOfOptions={this.state.currencies && this.state.currencies}/>
           </div>
 
           <div className="column col-3">
@@ -61,12 +64,7 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-            <select>
-              <option value="euro">United States Dollar</option>
-              <option value="USDollars">USD</option>
-              <option value="Jenes">JPY</option>
-              <option value="Niidea">BGN</option>
-            </select>
+            <Select numberOfOptions={this.state.currencies && this.state.currencies}/>
           </div>
 
         </div>   
