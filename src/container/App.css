@@ -89,10 +89,10 @@ h1 {
   color: #fdfefe;
 	margin-bottom: 10px;
 	text-align: center;
-	margin-bottom: 70px;
+	margin-bottom: 30px;
 }
 h2, h3 {
-  font-size: 1.4rem;
+  font-size: 0.8rem;
   margin-bottom: 1%;
   color: #fdfefe;
   font-weight: 700; 
@@ -132,7 +132,7 @@ img {
   }
 	select {
     width: 100%;
-    margin-top: 50px;
+    margin-top: 5px;
 	}
 	.wrapper {
 		max-width: 600px;

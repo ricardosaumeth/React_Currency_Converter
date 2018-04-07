@@ -8,7 +8,11 @@ import './App.css'
 class App extends Component {
 
   state = {
-    currencies: { }
+    currencies: [],
+    firstCurrencySymbol: null,
+    firstCurrencyRate: null,
+    secondCurrencySymbol: null,
+    secondCurrencyRate: null
   }
 
   loopNestedObj = (obj) => {
@@ -30,7 +34,16 @@ class App extends Component {
     parseString(data, (err, result) => {
       try {
         const currencies = this.loopNestedObj(result);
-        this.setState({ currencies: currencies });
+        const defaultCurrency = currencies[0].$.currency;
+        const defaultCurrencyRate = currencies[0].$.rate;
+
+        this.setState({ 
+          currencies: currencies,
+          firstCurrencySymbol: defaultCurrency,
+          firstCurrencyRate: defaultCurrencyRate,
+          secondCurrencySymbol: defaultCurrency,
+          secondCurrencyRate: defaultCurrencyRate
+        });
       }
       catch (error) {
         console.log(error);
@@ -51,6 +64,30 @@ class App extends Component {
       .catch((error) => console.log(error) );
   }
 
+  fisrtCurrencySelectedHandler = (ev) => {
+    const currencySymbol = ev.target.value;
+    const currencySelected = this.state.currencies.find((curr) => {
+      return (curr.$.currency === currencySymbol) && curr;
+    });
+
+    this.setState({ 
+      firstCurrencySymbol: currencySymbol,
+      firstCurrencyRate: currencySelected.$.rate
+    });
+  }
+
+  secondCurrencySelectedHandler = (ev) => {
+    const currencySymbol = ev.target.value;
+    const currencySelected = this.state.currencies.find((curr) => {
+      return (curr.$.currency === currencySymbol) && curr;
+    });
+
+    this.setState({ 
+      secondCurrencySymbol: currencySymbol,
+      secondCurrencyRate: currencySelected.$.rate
+    });
+  }
+
   render() {
     return (
 
@@ -59,7 +96,10 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-            <Select numberOfOptions={this.state.currencies && this.state.currencies}/>
+            <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.firstCurrencyRate}`}</h3>
+            <Select 
+              numberOfOptions={this.state.currencies && this.state.currencies} 
+              currencySelected={(ev) => this.fisrtCurrencySelectedHandler(ev)}/>
           </div>
 
           <div className="column col-3">
@@ -67,7 +107,10 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-            <Select numberOfOptions={this.state.currencies && this.state.currencies}/>
+          <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.secondCurrencyRate}`}</h3>
+            <Select 
+              numberOfOptions={this.state.currencies && this.state.currencies}
+              currencySelected={(ev) => this.secondCurrencySelectedHandler(ev)}/>
           </div>
 
         </div>   

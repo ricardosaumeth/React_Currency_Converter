@@ -4,7 +4,7 @@ const CurrencyDescriptionMapper = {
   BGN: "Bulgarian lev",
   CZK: "Czech koruna",
   DKK: "Danish krone",
-  GBP: "	Pound sterling",
+  GBP: "Pound sterling",
   HUF: "Hungarian forint",
   PLN: "Polish zloty",
   RON: "Romanian leu",

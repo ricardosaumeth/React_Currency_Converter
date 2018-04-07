@@ -13,7 +13,7 @@ const select = (props) => {
   }
 
   return (
-    <select>
+    <select onChange={ props.currencySelected }>
       {option}
     </select>
   );

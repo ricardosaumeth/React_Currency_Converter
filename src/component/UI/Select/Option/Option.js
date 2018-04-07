@@ -6,7 +6,7 @@ import {CurrencyDescriptionMapper as CurrencyTypes}from '../../../../utils/curre
 const option = (props) => {
 
   return (
-    <option value={CurrencyTypes[props.value]}>{CurrencyTypes[props.text]}</option>
+    <option value={props.value}>{CurrencyTypes[props.text]}</option>
   );
 };
 
