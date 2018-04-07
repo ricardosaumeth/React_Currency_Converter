@@ -18,7 +18,10 @@ class App extends Component {
     var innerCubes = outterCubes.Cube;
     var innerCubesArray = innerCubes[0];
     var Cubes = innerCubesArray.Cube;
-    // Cubes.map(cube => console.log(cube.$.currency));
+    // Cubes.map(cube => {
+    //   console.log(cube.$.currency);
+    //   console.log(cube.$.rate);  
+    // });
     return Cubes;
   }
 
