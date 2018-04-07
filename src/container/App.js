@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { parseString } from 'xml2js'
 
 import Select from '../component/UI/Select/Select'
+import Input from '../component/UI/Input/Input'
 
 import './App.css'
 
@@ -12,7 +13,10 @@ class App extends Component {
     firstCurrencySymbol: null,
     firstCurrencyRate: null,
     secondCurrencySymbol: null,
-    secondCurrencyRate: null
+    secondCurrencyRate: null,
+
+    firstCurrencyQuantity: '',
+    secondCurrencyQuantity: ''
   }
 
   loopNestedObj = (obj) => {
@@ -88,7 +92,39 @@ class App extends Component {
     });
   }
 
+  firstCurrencyRateHandler = (ev) => {
+    ev.preventDefault();
+    
+    let quantity = undefined;
+    /* We only allow the user to type numbers */
+    if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
+      quantity = parseFloat(ev.target.value) * parseFloat(this.state.secondCurrencyRate);
+    }
+
+    this.setState({ 
+      firstCurrencyQuantity: +ev.target.value,
+      secondCurrencyQuantity: quantity
+    });
+  }
+
+  secondCurrencyRateHandler = (ev) => {
+    ev.preventDefault();
+    
+    let quantity = undefined;
+    /* We only allow the user to type numbers */
+    if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
+      quantity = parseFloat(ev.target.value) / parseFloat(this.state.firstCurrencyRate);
+    }
+
+    this.setState({ 
+      firstCurrencyQuantity: +ev.target.value,
+      secondCurrencyQuantity: quantity
+    });
+  }
+
   render() {
+
+    
     return (
 
         <div className="wrapper">
@@ -96,14 +132,18 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-            <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.secondCurrencyRate} ${this.state.secondCurrencySymbol}`}</h3>
+          <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.secondCurrencyRate} ${this.state.secondCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies} 
               currencySelected={(ev) => this.fisrtCurrencySelectedHandler(ev)}/>
-
-            <input value={this.state.secondCurrencyRate}/>
-
+            
+            <Input 
+              value={this.state.firstCurrencyQuantity ? parseFloat(this.state.firstCurrencyQuantity).toFixed(0) : ''} 
+              changed={this.firstCurrencyRateHandler}
+              placeholder={'Type a quantity to calculate'}
+              /> 
+            
           </div>
 
           <div className="column col-3">
@@ -111,13 +151,17 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-            <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.firstCurrencyRate} ${this.state.firstCurrencySymbol}`}</h3>
+          <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.firstCurrencyRate} ${this.state.firstCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies}
               currencySelected={(ev) => this.secondCurrencySelectedHandler(ev)}/>
 
-            <input value={this.state.firstCurrencyRate}/>
+            <Input 
+              value={this.state.secondCurrencyQuantity ? parseFloat(this.state.secondCurrencyQuantity).toFixed(0) : ''}
+              changed={this.secondCurrencyRateHandler}
+              placeholder={'Type a quantity to calculate'}
+              />
 
           </div>
 

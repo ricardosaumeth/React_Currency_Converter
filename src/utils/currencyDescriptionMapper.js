@@ -1,4 +1,5 @@
 const CurrencyDescriptionMapper = {
+  EUR: "Euro",
   JPY: "Japanese yen",
   USD: "US dollar",
   BGN: "Bulgarian lev",
