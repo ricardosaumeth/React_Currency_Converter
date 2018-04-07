@@ -26,10 +26,6 @@ class App extends Component {
     var innerCubes = outterCubes.Cube;
     var innerCubesArray = innerCubes[0];
     var Cubes = innerCubesArray.Cube;
-    // Cubes.map(cube => {
-    //   console.log(cube.$.currency);
-    //   console.log(cube.$.rate);  
-    // });
     return Cubes;
   }
 
@@ -98,7 +94,7 @@ class App extends Component {
     let quantity = undefined;
     /* We only allow the user to type numbers */
     if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = parseFloat(ev.target.value) * parseFloat(this.state.secondCurrencyRate);
+      quantity = this.convertFromSecondCurrencyToFirts(+ev.target.value);
     }
 
     this.setState({ 
@@ -113,18 +109,29 @@ class App extends Component {
     let quantity = undefined;
     /* We only allow the user to type numbers */
     if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = parseFloat(ev.target.value) / parseFloat(this.state.firstCurrencyRate);
+      quantity = this.convertFromFirstCurrencyToSecond(+ev.target.value);
     }
 
     this.setState({ 
-      firstCurrencyQuantity: +ev.target.value,
-      secondCurrencyQuantity: quantity
+      secondCurrencyQuantity: +ev.target.value,
+      firstCurrencyQuantity: quantity
     });
+  }
+
+  convertFromFirstCurrencyToSecond(number = 1) {
+    const EurosToFirstCurrency = this.state.firstCurrencyRate;
+    const EurosTosecondCurrency = number / this.state.secondCurrencyRate;
+    return EurosToFirstCurrency * EurosTosecondCurrency;
+  }
+
+  convertFromSecondCurrencyToFirts(number = 1) {
+    const EurosToFirstCurrency = number / this.state.firstCurrencyRate;
+    const EurosTosecondCurrency = this.state.secondCurrencyRate;
+    return EurosToFirstCurrency * EurosTosecondCurrency;
   }
 
   render() {
 
-    
     return (
 
         <div className="wrapper">
@@ -132,7 +139,7 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-          <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.secondCurrencyRate} ${this.state.secondCurrencySymbol}`}</h3>
+          <h3>{`1 ${this.state.firstCurrencySymbol} = ${parseFloat(this.convertFromSecondCurrencyToFirts()).toFixed(8)} ${this.state.secondCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies} 
@@ -151,7 +158,7 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-          <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.firstCurrencyRate} ${this.state.firstCurrencySymbol}`}</h3>
+          <h3>{`1 ${this.state.secondCurrencySymbol} = ${parseFloat(this.convertFromFirstCurrencyToSecond()).toFixed(8)} ${this.state.firstCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies}
