@@ -96,10 +96,14 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-            <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.firstCurrencyRate}`}</h3>
+            <h3>{`1 ${this.state.firstCurrencySymbol} = ${this.state.secondCurrencyRate} ${this.state.secondCurrencySymbol}`}</h3>
+            
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies} 
               currencySelected={(ev) => this.fisrtCurrencySelectedHandler(ev)}/>
+
+            <input value={this.state.secondCurrencyRate}/>
+
           </div>
 
           <div className="column col-3">
@@ -107,10 +111,14 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-          <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.secondCurrencyRate}`}</h3>
+            <h3>{`1 ${this.state.secondCurrencySymbol} = ${this.state.firstCurrencyRate} ${this.state.firstCurrencySymbol}`}</h3>
+            
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies}
               currencySelected={(ev) => this.secondCurrencySelectedHandler(ev)}/>
+
+            <input value={this.state.firstCurrencyRate}/>
+
           </div>
 
         </div>   
