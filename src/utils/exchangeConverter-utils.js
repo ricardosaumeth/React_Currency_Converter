@@ -19,6 +19,7 @@ function exchangeConverter(exchangeType, currencyQuantity, firstCurrencyRate, se
     EurosToFirstCurrency = firstCurrencyRate;
     EurosToSecondCurrency = number / secondCurrencyRate;
   }
+
   return EurosToFirstCurrency * EurosToSecondCurrency; 
 }
 

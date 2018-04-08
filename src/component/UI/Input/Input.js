@@ -5,8 +5,7 @@ const input = (props) => {
     <input
       value={props.value}
       onChange={props.changed} 
-      placeholder={props.placeholder}
-      /* onFocus={props.Focus} *//>   
+      placeholder={props.placeholder}/>   
   );
 }
 

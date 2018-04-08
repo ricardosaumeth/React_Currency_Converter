@@ -8,7 +8,6 @@ import { loopNestedObj } from '../utils/formatXML-utils';
 import { ExchangeConversionType, exchangeConverter } from '../utils/exchangeConverter-utils'
 import './App.css'
 
-
 class App extends Component {
 
   state = {
