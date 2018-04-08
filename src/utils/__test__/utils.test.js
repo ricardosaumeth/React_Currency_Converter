@@ -2,7 +2,7 @@ import
   { ExchangeConversionType, exchangeConverter }
   from '../exchangeConverter-utils'
 
-import loopNestedObj from '../formatXML-utils'  
+const formatXML = require('../formatXML-utils');
 
 const data = {
   "gesmes:Envelope": {
@@ -64,9 +64,8 @@ it('should calculate the exchange rate JPY/UDS', () => {
   expect(result).toBe(4.658087115443193);
 });
 
-/**
- * Jest is not able to process these object. Need to investigate
- */
-xit('formatXML', () => {
-  expect(formattedData).toEqual(loopNestedObj(data));
+it('formatXML', () => {
+  // expect(formatXML.loopNestedObj(data)).toContainObject(formattedData);
+  expect(formatXML.loopNestedObj(data)).toEqual(formattedData);
 });
+
