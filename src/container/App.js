@@ -4,7 +4,10 @@ import { parseString } from 'xml2js'
 import Select from '../component/UI/Select/Select'
 import Input from '../component/UI/Input/Input'
 
+import { loopNestedObj } from '../utils/formatXML-utils';
+import { ExchangeConversionType, exchangeConverter } from '../utils/exchangeConverter-utils'
 import './App.css'
+
 
 class App extends Component {
 
@@ -19,21 +22,10 @@ class App extends Component {
     secondCurrencyQuantity: ''
   }
 
-  loopNestedObj = (obj) => {
-    var gesmes = obj["gesmes:Envelope"];
-    var outterCubeArray = gesmes.Cube;
-    var outterCubes = outterCubeArray[0];
-    var innerCubes = outterCubes.Cube;
-    var innerCubesArray = innerCubes[0];
-    var Cubes = innerCubesArray.Cube;
-    return Cubes;
-  }
-
-
-  toJSON (data) {
+  formatXML (data) {
     parseString(data, (err, result) => {
       try {
-        const currencies = this.loopNestedObj(result);
+        const currencies = loopNestedObj(result);
         const defaultCurrency = currencies[0].$.currency;
         const defaultCurrencyRate = currencies[0].$.rate;
 
@@ -47,8 +39,7 @@ class App extends Component {
       }
       catch (error) {
         console.log(error);
-      }
-       
+      }   
     });  
   }
 
@@ -59,7 +50,7 @@ class App extends Component {
         return response.text(); 
       })
       .then((data) => {
-        this.toJSON(data);
+        this.formatXML(data);
       })
       .catch((error) => console.log(error) );
   }
@@ -94,7 +85,7 @@ class App extends Component {
     let quantity = undefined;
     /* We only allow the user to type numbers */
     if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = this.convertFromSecondCurrencyToFirts(+ev.target.value);
+      quantity = exchangeConverter(ExchangeConversionType.First, +ev.target.value, this.state.firstCurrencyRate, this.state.secondCurrencyRate);
     }
 
     this.setState({ 
@@ -109,7 +100,7 @@ class App extends Component {
     let quantity = undefined;
     /* We only allow the user to type numbers */
     if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = this.convertFromFirstCurrencyToSecond(+ev.target.value);
+      quantity = exchangeConverter(ExchangeConversionType.Second, +ev.target.value, this.state.firstCurrencyRate, this.state.secondCurrencyRate);
     }
 
     this.setState({ 
@@ -118,19 +109,13 @@ class App extends Component {
     });
   }
 
-  convertFromFirstCurrencyToSecond(number = 1) {
-    const EurosToFirstCurrency = this.state.firstCurrencyRate;
-    const EurosTosecondCurrency = number / this.state.secondCurrencyRate;
-    return EurosToFirstCurrency * EurosTosecondCurrency;
-  }
-
-  convertFromSecondCurrencyToFirts(number = 1) {
-    const EurosToFirstCurrency = number / this.state.firstCurrencyRate;
-    const EurosTosecondCurrency = this.state.secondCurrencyRate;
-    return EurosToFirstCurrency * EurosTosecondCurrency;
-  }
-
   render() {
+
+    const firstCurrencySymbol = this.state.firstCurrencySymbol;
+    const secondCurrencySymbol = this.state.secondCurrencySymbol;
+    
+    const exchangeRateA = parseFloat(exchangeConverter(ExchangeConversionType.First, null, this.state.firstCurrencyRate, this.state.secondCurrencyRate)).toFixed(8);
+    const exchangeRateB = parseFloat(exchangeConverter(ExchangeConversionType.Second, null, this.state.firstCurrencyRate, this.state.secondCurrencyRate)).toFixed(8);
 
     return (
 
@@ -139,7 +124,8 @@ class App extends Component {
           <h1>Currency Converter</h1>
 
           <div className="column col-3"> 
-          <h3>{`1 ${this.state.firstCurrencySymbol} = ${parseFloat(this.convertFromSecondCurrencyToFirts()).toFixed(8)} ${this.state.secondCurrencySymbol}`}</h3>
+
+          <h3>{`1 ${firstCurrencySymbol} = ${exchangeRateA} ${secondCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies} 
@@ -158,7 +144,7 @@ class App extends Component {
           </div>
 
           <div className="column col-3">
-          <h3>{`1 ${this.state.secondCurrencySymbol} = ${parseFloat(this.convertFromFirstCurrencyToSecond()).toFixed(8)} ${this.state.firstCurrencySymbol}`}</h3>
+          <h3>{`1 ${secondCurrencySymbol} = ${exchangeRateB} ${firstCurrencySymbol}`}</h3>
             
             <Select 
               numberOfOptions={this.state.currencies && this.state.currencies}
@@ -167,8 +153,7 @@ class App extends Component {
             <Input 
               value={this.state.secondCurrencyQuantity ? parseFloat(this.state.secondCurrencyQuantity).toFixed(0) : ''}
               changed={this.secondCurrencyRateHandler}
-              placeholder={'Type a quantity to calculate'}
-              />
+              placeholder={'Type a quantity to calculate'}/>
 
           </div>
 
