@@ -21,7 +21,7 @@ class App extends Component {
     secondCurrencyQuantity: ''
   }
 
-  formatXML (data) {
+  _formatXML (data) {
     parseString(data, (err, result) => {
       try {
         const currencies = loopNestedObj(result);
@@ -49,72 +49,78 @@ class App extends Component {
         return response.text(); 
       })
       .then((data) => {
-        this.formatXML(data);
+        this._formatXML(data);
       })
       .catch((error) => console.log(error) );
   }
 
-  fisrtCurrencySelectedHandler = (ev) => {
+  _setCurrency = (ev, exchangeRateType) => {
     const currencySymbol = ev.target.value;
     const currencySelected = this.state.currencies.find((curr) => {
       return (curr.$.currency === currencySymbol) && curr;
     });
 
-    this.setState({ 
-      firstCurrencySymbol: currencySymbol,
-      firstCurrencyRate: currencySelected.$.rate
-    });
-  }
-
-  secondCurrencySelectedHandler = (ev) => {
-    const currencySymbol = ev.target.value;
-    const currencySelected = this.state.currencies.find((curr) => {
-      return (curr.$.currency === currencySymbol) && curr;
-    });
-
-    this.setState({ 
-      secondCurrencySymbol: currencySymbol,
-      secondCurrencyRate: currencySelected.$.rate
-    });
-  }
-
-  firstCurrencyRateHandler = (ev) => {
-    ev.preventDefault();
-    
-    let quantity = undefined;
-    /* We only allow the user to type numbers */
-    if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = exchangeConverter(ExchangeConversionType.First, +ev.target.value, this.state.firstCurrencyRate, this.state.secondCurrencyRate);
+    if(exchangeRateType === ExchangeConversionType.First) {
+      this.setState({
+        firstCurrencySymbol: currencySymbol,
+        firstCurrencyRate: currencySelected.$.rate
+      });
+    } else {
+      this.setState({
+        secondCurrencySymbol: currencySymbol,
+        secondCurrencyRate: currencySelected.$.rate
+      });
     }
 
-    this.setState({ 
-      firstCurrencyQuantity: +ev.target.value,
-      secondCurrencyQuantity: quantity
-    });
   }
 
-  secondCurrencyRateHandler = (ev) => {
+  _getCurrencyRate = (ev, exchangeRateType) => {
     ev.preventDefault();
-    
+
     let quantity = undefined;
-    /* We only allow the user to type numbers */
-    if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
-      quantity = exchangeConverter(ExchangeConversionType.Second, +ev.target.value, this.state.firstCurrencyRate, this.state.secondCurrencyRate);
+
+    if(exchangeRateType === ExchangeConversionType.First) {
+      quantity = this._getExchangeConverter(ev, ExchangeConversionType.First);
+      this.setState({
+        firstCurrencyQuantity: +ev.target.value,
+        secondCurrencyQuantity: quantity
+      });
+    } else {
+      quantity = this._getExchangeConverter(ev, ExchangeConversionType.Second);
+      this.setState({
+        secondCurrencyQuantity: +ev.target.value,
+        firstCurrencyQuantity: quantity
+      });
     }
 
-    this.setState({ 
-      secondCurrencyQuantity: +ev.target.value,
-      firstCurrencyQuantity: quantity
-    });
+  }
+
+  _getExchangeConverter = (ev, exchangeRateType) => {
+    /* We only allow the user to type numbers */
+    if ((typeof ev.target.value === 'string') && (ev.target.value !== "")) {
+      return exchangeConverter(exchangeRateType, +ev.target.value, this.state.firstCurrencyRate, this.state.secondCurrencyRate);
+    }
+  }
+
+  _getExchangeRate = exchangeRateType => {
+    return parseFloat(
+        exchangeConverter(
+            exchangeRateType, null, this.state.firstCurrencyRate, this.state.secondCurrencyRate
+        ))
+        .toFixed(8);
   }
 
   render() {
-
-    const firstCurrencySymbol = this.state.firstCurrencySymbol;
-    const secondCurrencySymbol = this.state.secondCurrencySymbol;
+    const {
+      firstCurrencySymbol,
+      secondCurrencySymbol,
+      firstCurrencyQuantity,
+      secondCurrencyQuantity,
+      currencies
+    } = this.state;
     
-    const exchangeRateA = parseFloat(exchangeConverter(ExchangeConversionType.First, null, this.state.firstCurrencyRate, this.state.secondCurrencyRate)).toFixed(8);
-    const exchangeRateB = parseFloat(exchangeConverter(ExchangeConversionType.Second, null, this.state.firstCurrencyRate, this.state.secondCurrencyRate)).toFixed(8);
+    const exchangeRateA = this._getExchangeRate(ExchangeConversionType.First);
+    const exchangeRateB = this._getExchangeRate(ExchangeConversionType.Second);
 
     return (
 
@@ -127,12 +133,12 @@ class App extends Component {
           <h3>{`1 ${firstCurrencySymbol} = ${exchangeRateA} ${secondCurrencySymbol}`}</h3>
             
             <Select 
-              numberOfOptions={this.state.currencies && this.state.currencies} 
-              currencySelected={(ev) => this.fisrtCurrencySelectedHandler(ev)}/>
+              numberOfOptions={currencies && currencies}
+              currencySelected={(ev) => this._setCurrency(ev, ExchangeConversionType.First)}/>
             
             <Input 
-              value={this.state.firstCurrencyQuantity ? parseFloat(this.state.firstCurrencyQuantity).toFixed(0) : ''} 
-              changed={this.firstCurrencyRateHandler}
+              value={firstCurrencyQuantity ? parseFloat(firstCurrencyQuantity).toFixed(0) : ''}
+              changed={ev => this._getExchangeRate(ev, ExchangeConversionType.First)}
               placeholder={'Type a quantity to calculate'}
               /> 
             
@@ -146,12 +152,12 @@ class App extends Component {
           <h3>{`1 ${secondCurrencySymbol} = ${exchangeRateB} ${firstCurrencySymbol}`}</h3>
             
             <Select 
-              numberOfOptions={this.state.currencies && this.state.currencies}
-              currencySelected={(ev) => this.secondCurrencySelectedHandler(ev)}/>
+              numberOfOptions={currencies && currencies}
+              currencySelected={(ev) => this._setCurrency(ev, ExchangeConversionType.Second)}/>
 
             <Input 
-              value={this.state.secondCurrencyQuantity ? parseFloat(this.state.secondCurrencyQuantity).toFixed(0) : ''}
-              changed={this.secondCurrencyRateHandler}
+              value={secondCurrencyQuantity ? parseFloat(secondCurrencyQuantity).toFixed(0) : ''}
+              changed={ev => this._getCurrencyRate(ev, ExchangeConversionType.Second)}
               placeholder={'Type a quantity to calculate'}/>
 
           </div>

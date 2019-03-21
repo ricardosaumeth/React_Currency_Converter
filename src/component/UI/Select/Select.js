@@ -1,22 +1,22 @@
-import React from 'react'
-import Option from './Option/Option'
+import React from 'react';
+import Option from './Option/Option';
 
-const select = (props) => {
-  
-  const { numberOfOptions }  = props;
-  let option = null;
+const select = ({ numberOfOptions, currencySelected }) => {
+  let options = null;
 
-  if ( Array.isArray(numberOfOptions) ) {
-    option = numberOfOptions.map((option) => {
-      return <Option key={option.$.currency} value={option.$.currency} text={option.$.currency}/>
-    })
+  if (Array.isArray(numberOfOptions)) {
+    options = numberOfOptions.map(option => {
+      return (
+        <Option
+          key={option.$.currency}
+          value={option.$.currency}
+          text={option.$.currency}
+        />
+      );
+    });
   }
 
-  return (
-    <select onChange={ props.currencySelected } >
-      {option}
-    </select>
-  );
-}
+  return <select onChange={currencySelected}>{options}</select>;
+};
 
 export default select;
